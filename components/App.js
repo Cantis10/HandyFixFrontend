@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState, useEffect } from "react";
 import { AppContext } from "../contexts/appContext";
 import {
   NavigationContainer,
@@ -15,21 +15,43 @@ import send from "./fixes/send";
 import logs from "./logs/logs";
 import chat from "./chats/chatLists";
 import ChatDetails from "./chats/chatDetails";
-import Register from "./Register";
+import Register from "./Signing/RegisterComponent";
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 //npx expo start
 export default function App() {
-  const { user } = useContext(AppContext);
+  const { user, checkUserCredentials } = useContext(AppContext);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  useEffect(() => {
+    const verifyUser = async () => {
+      if (!user) {
+        setIsLoggedIn(false);
+        setLoading(false);
+        return;
+      }
+
+      const valid = await checkCredentials();
+      setIsLoggedIn(valid);
+      setLoading(false);
+    };
+
+    verifyUser();
+  }, [user]);
   return (
     <>
       <NavigationContainer>
-        <Tab.Navigator screenOptions={{ headerShown: false }}>
-          <Tab.Screen name="Home" component={HomeStack} />
-          <Tab.Screen name="Chat" component={ChatStack} />
-          <Tab.Screen name="Settings" component={SettingsStack} />
-        </Tab.Navigator>
+        {isLoggedIn ? (
+          <Tab.Navigator screenOptions={{ headerShown: false }}>
+            <Tab.Screen name="Home" component={HomeStack} />
+            <Tab.Screen name="Chat" component={ChatStack} />
+            <Tab.Screen name="Settings" component={SettingsStack} />
+          </Tab.Navigator>
+        ) : (
+          <Stack.Navigator initialRouteName="Register">
+            <Stack.Screen name="Register" component={Register} />
+          </Stack.Navigator>
+        )}
       </NavigationContainer>
     </>
   );

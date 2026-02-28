@@ -37,12 +37,6 @@ export function AppProvider({ children }) {
     },
   });
 
-  const defaultUser = {
-    theme_type: "light",
-    first_name: " THIS MF IS UNKNOWN!",
-    email: "",
-  };
-
   useEffect(() => {
     const initializeUser = async () => {
       try {
@@ -51,12 +45,11 @@ export function AppProvider({ children }) {
         if (storedUser) {
           console.log("RAW storedUser:", storedUser);
           const parsedUser = JSON.parse(storedUser);
-          const mergedUser = { ...defaultUser, ...parsedUser };
-          if (!mergedUser.name) mergedUser.name = defaultUser.name;
-          setUser(mergedUser);
+          setUser(parsedUser);
         } else {
-          await AsyncStorage.setItem("user", JSON.stringify(defaultUser));
-          setUser(defaultUser);
+          const noUser = { email: "", password: "" };
+          await AsyncStorage.setItem("user", JSON.stringify(noUser));
+          setUser(noUser);
         }
       } catch (e) {
         console.error("Failed to initialize user:", e);
@@ -65,6 +58,27 @@ export function AppProvider({ children }) {
 
     initializeUser();
   }, []);
+
+  const checkUserCredentials = async () => {
+    try {
+      const storedUser = await AsyncStorage.getItem("user");
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+      }
+    } catch (e) {
+      console.error("Failed to check user credentials:", e);
+    }
+  };
+
+  const clearUserData = async () => {
+    try {
+      await AsyncStorage.removeItem("user");
+      setUser(null);
+    } catch (e) {
+      console.error("Failed to clear user data:", e);
+    }
+  };
 
   useEffect(() => {
     const saveUser = async () => {
@@ -81,7 +95,16 @@ export function AppProvider({ children }) {
   }, [user]);
 
   return (
-    <AppContext.Provider value={{ user, setUser, theme, link }}>
+    <AppContext.Provider
+      value={{
+        user,
+        setUser,
+        theme,
+        link,
+        checkUserCredentials,
+        clearUserData,
+      }}
+    >
       {children}
     </AppContext.Provider>
   );

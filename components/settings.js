@@ -12,49 +12,42 @@ import { AppContext } from "../contexts/appContext";
 
 export default function SettingsScreen({ route, navigation }) {
   const settingsData = route.params ?? {};
-  const { theme, user, setUser, link } = useContext(AppContext);
+  const { theme, user, setUser, link, clearUserData } = useContext(AppContext);
   const styles = createStyles(theme);
 
   const [data, setData] = React.useState(null);
   useEffect(() => {
-    fetch(link.url + "test")
-      .then((response) => {
-        if (!response.ok) throw new Error("Network response not ok");
-        return response.json();
-      })
-      .then((json) => {
-        console.log("Fetched JSON:", json);
-        setData(json);
-      })
-      .catch((error) => console.error("Fetch error:", error));
-  }, []);
+    const intervalId = setInterval(() => {
+      fetch(link.url + "test")
+        .then((response) => {
+          if (!response.ok) throw new Error("Network response not ok");
+          return response.json();
+        })
+        .then((json) => setData(json))
+        .catch((error) => console.error("Fetch error:", error));
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [link.url]);
 
   //postTestData
   const [postResponse, setPostResponse] = useState(null);
 
   useEffect(() => {
-    const postData = {
-      message: "Hello from the app!",
-    };
+    const postData = { message: "Hello from the app!" };
 
-    console.log("Posting data to:", link.url + "post");
     fetch(link.url + "post", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(postData),
     })
       .then((response) => {
         if (!response.ok) throw new Error("Network response not ok");
         return response.json();
       })
-      .then((json) => {
-        console.log("POST response JSON:", json);
-        setPostResponse(json);
-      })
+      .then((json) => setPostResponse(json))
       .catch((error) => console.error("POST error:", error));
-  }, []);
+  }, [link.url]);
 
   return (
     <View style={styles.container}>
@@ -65,13 +58,20 @@ export default function SettingsScreen({ route, navigation }) {
       </Text>
       <Text>Language: {settingsData.language}</Text>
 
+      <TouchableHighlight
+        onPress={() => {
+          clearUserData();
+          console.log("User data cleared");
+        }}
+      >
+        <Text style={{ color: "red", marginTop: 20 }}>Clear User Data</Text>
+      </TouchableHighlight>
       {data ? <Text>{data.messages}</Text> : <Text>Loading...</Text>}
       {postResponse ? (
         <Text>{postResponse.message}</Text>
       ) : (
         <Text>Posting...</Text>
       )}
-
       <TouchableHighlight
         onPress={() => {
           console.log("Pressed");

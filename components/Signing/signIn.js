@@ -27,7 +27,7 @@ export default function signIn({ route, navigation }) {
     address: "", //optional
   });
 
-  const confirmRegister = () => {
+  const confirmRegister = async () => {
     if (
       !formRegisterData.first_name ||
       !formRegisterData.last_name ||
@@ -35,8 +35,7 @@ export default function signIn({ route, navigation }) {
       !formRegisterData.password ||
       !formRegisterData.confirm_password ||
       !formRegisterData.age ||
-      !formRegisterData.contact_number ||
-      !formRegisterData.address
+      !formRegisterData.contact_number
     ) {
       alert("Please fill in all fields");
       return;
@@ -47,20 +46,19 @@ export default function signIn({ route, navigation }) {
       return;
     }
 
-    const result = registerAuth(
-      formRegisterData.first_name,
-      formRegisterData.last_name,
-      formRegisterData.email,
-      formRegisterData.password,
-      formRegisterData.age,
-      formRegisterData.contact_number,
-      formRegisterData.address,
+    console.log(
+      "confirmRegister log:",
+      JSON.stringify(formRegisterData, null, 2),
     );
 
+    const result = await registerAuth(formRegisterData);
+
     if (result.success) {
-      alert("Login successful");
+      alert("Register successful");
+
+      loginAuth(formRegisterData.email, formRegisterData.password);
     } else {
-      alert("Login failed: " + result.message);
+      alert("Login failed: " + result.error);
     }
   };
 
@@ -98,6 +96,15 @@ export default function signIn({ route, navigation }) {
         value={formRegisterData.password}
         onChangeText={(text) =>
           setFormRegisterData({ ...formRegisterData, password: text })
+        }
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Confirm Password"
+        secureTextEntry
+        value={formRegisterData.confirm_password}
+        onChangeText={(text) =>
+          setFormRegisterData({ ...formRegisterData, confirm_password: text })
         }
       />
       <TextInput

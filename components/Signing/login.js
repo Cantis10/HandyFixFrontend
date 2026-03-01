@@ -21,17 +21,25 @@ export default function Login({ route, navigation }) {
     password: "",
   });
 
-  const confirmLogin = () => {
+  const confirmLogin = async () => {
     if (!formRegisterData.email || !formRegisterData.password) {
       alert("Please fill in all fields");
       return;
     }
-    const result = loginAuth(formRegisterData.email, formRegisterData.password);
-    //await result and check if login was successful. if not alert user
+
+    const result = await loginAuth(
+      formRegisterData.email,
+      formRegisterData.password,
+    );
+
     if (result.success) {
       alert("Login successful");
     } else {
-      alert("Login failed: " + result.message);
+      alert(
+        "Login failed: " +
+          (result.status === 401 ? "Invalid credentials" : result.error),
+      );
+      console.log(result);
     }
   };
 

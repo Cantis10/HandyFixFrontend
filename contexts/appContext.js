@@ -4,9 +4,10 @@ export const AppContext = createContext();
 
 export function AppProvider({ children }) {
   const [user, setUser] = useState(null);
-
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [link, setLink] = useState({
-    url: "https://handy-fix-theta.vercel.app/",
+    //url: "https://handy-fix-theta.vercel.app/",
+    url: "http://10.0.2.2:3000/",
   });
 
   const [theme, setTheme] = useState({
@@ -78,6 +79,7 @@ export function AppProvider({ children }) {
 
       const data = await response.json();
       setUser(data);
+      setIsLoggedIn(true);
       return { success: true, data };
     } catch (error) {
       console.error("Login error:", error);
@@ -85,28 +87,23 @@ export function AppProvider({ children }) {
     }
   };
 
-  const registerAuth = async (
-    first_name,
-    last_name,
-    age,
-    email,
-    password,
-    contact_number,
-    adress,
-  ) => {
+  const registerAuth = async (formData) => {
     const userData = {
-      first_name,
-      last_name,
-      age,
-      email,
-      password,
-      contact_number,
-      adress,
+      first_name: formData.first_name,
+      last_name: formData.last_name,
+      age: formData.age,
+      email: formData.email,
+      password: formData.password,
+      contact_number: formData.contact_number,
+      address: formData.address,
     };
+
     setUser(userData);
 
     try {
       await AsyncStorage.setItem("user", JSON.stringify(userData));
+
+      console.log(userData);
 
       const response = await fetch(link.url + "api/register", {
         method: "POST",
@@ -115,12 +112,11 @@ export function AppProvider({ children }) {
       });
 
       if (!response.ok) {
-        console.error(
-          "Registration failed:",
-          response.status,
-          response.statusText,
-        );
-        return { success: false, status: response.status };
+        return {
+          success: false,
+          status: response.status,
+          error: "Registration failed",
+        };
       }
 
       const data = await response.json();
@@ -165,6 +161,8 @@ export function AppProvider({ children }) {
         clearUserData,
         loginAuth,
         registerAuth,
+        isLoggedIn,
+        setIsLoggedIn,
       }}
     >
       {children}

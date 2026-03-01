@@ -20,23 +20,8 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 //npx expo start
 export default function App() {
-  const { user, loginAuth } = useContext(AppContext);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { user, loginAuth, isLoggedIn } = useContext(AppContext);
 
-  //check if user is logged in on app load. then set isLoggedIn to true if user data exists
-  useEffect(() => {
-    const checkLogin = async () => {
-      const storedUser = await loginAuth(user.email, user.password);
-
-      if (storedUser.success) {
-        setIsLoggedIn(true);
-      } else {
-        setIsLoggedIn(false);
-      }
-    };
-
-    checkLogin();
-  }, []);
   return (
     <>
       <NavigationContainer>
@@ -92,7 +77,6 @@ function RegisterStack() {
       screenOptions={{ headerShown: false }}
     >
       <Stack.Screen name="Register" component={Register} />
-      <Stack.Screen name="Home" component={home} />
     </Stack.Navigator>
   );
 }

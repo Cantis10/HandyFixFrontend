@@ -20,24 +20,23 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 //npx expo start
 export default function App() {
-  const { user, checkUserCredentials } = useContext(AppContext);
+  const { user, loginAuth } = useContext(AppContext);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  //check if user is logged in on app load. then set isLoggedIn to true if user data exists
   useEffect(() => {
-    const verifyUser = async () => {
-      if (!user) {
-        setIsLoggedIn(false);
-        setLoading(false);
-        return;
-      }
+    const checkLogin = async () => {
+      const storedUser = await loginAuth(user.email, user.password);
 
-      const valid = await checkCredentials();
-      setIsLoggedIn(valid);
-      setLoading(false);
+      if (storedUser.success) {
+        setIsLoggedIn(true);
+      } else {
+        setIsLoggedIn(false);
+      }
     };
 
-    verifyUser();
-  }, [user]);
+    checkLogin();
+  }, []);
   return (
     <>
       <NavigationContainer>
@@ -48,8 +47,8 @@ export default function App() {
             <Tab.Screen name="Settings" component={SettingsStack} />
           </Tab.Navigator>
         ) : (
-          <Stack.Navigator initialRouteName="Register">
-            <Stack.Screen name="Register" component={Register} />
+          <Stack.Navigator initialRouteName="RegisterContainer">
+            <Stack.Screen name="RegisterContainer" component={RegisterStack} />
           </Stack.Navigator>
         )}
       </NavigationContainer>
@@ -82,6 +81,18 @@ function SettingsStack() {
   return (
     <Stack.Navigator initialRouteName="Settings">
       <Stack.Screen name="Settings" component={settings} />
+    </Stack.Navigator>
+  );
+}
+
+function RegisterStack() {
+  return (
+    <Stack.Navigator
+      initialRouteName="Register"
+      screenOptions={{ headerShown: false }}
+    >
+      <Stack.Screen name="Register" component={Register} />
+      <Stack.Screen name="Home" component={home} />
     </Stack.Navigator>
   );
 }

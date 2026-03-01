@@ -59,15 +59,76 @@ export function AppProvider({ children }) {
     initializeUser();
   }, []);
 
-  const checkUserCredentials = async () => {
+  const loginAuth = async (email, password) => {
+    const userData = { email, password };
+    setUser(userData);
     try {
-      const storedUser = await AsyncStorage.getItem("user");
-      if (storedUser) {
-        const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
+      await AsyncStorage.setItem("user", JSON.stringify(userData));
+
+      const response = await fetch(link.url + "api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userData),
+      });
+
+      if (!response.ok) {
+        console.error("Login failed:", response.status, response.statusText);
+        return { success: false, status: response.status };
       }
-    } catch (e) {
-      console.error("Failed to check user credentials:", e);
+
+      const data = await response.json();
+      setUser(data);
+      return { success: true, data };
+    } catch (error) {
+      console.error("Login error:", error);
+      return { success: false, error };
+    }
+  };
+
+  const registerAuth = async (
+    first_name,
+    last_name,
+    age,
+    email,
+    password,
+    contact_number,
+    adress,
+  ) => {
+    const userData = {
+      first_name,
+      last_name,
+      age,
+      email,
+      password,
+      contact_number,
+      adress,
+    };
+    setUser(userData);
+
+    try {
+      await AsyncStorage.setItem("user", JSON.stringify(userData));
+
+      const response = await fetch(link.url + "api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userData),
+      });
+
+      if (!response.ok) {
+        console.error(
+          "Registration failed:",
+          response.status,
+          response.statusText,
+        );
+        return { success: false, status: response.status };
+      }
+
+      const data = await response.json();
+      setUser(data);
+      return { success: true, data };
+    } catch (error) {
+      console.error("Registration error:", error);
+      return { success: false, error };
     }
   };
 
@@ -101,8 +162,9 @@ export function AppProvider({ children }) {
         setUser,
         theme,
         link,
-        checkUserCredentials,
         clearUserData,
+        loginAuth,
+        registerAuth,
       }}
     >
       {children}

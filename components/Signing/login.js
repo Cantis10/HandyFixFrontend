@@ -13,13 +13,27 @@ import { AppContext } from "../../contexts/appContext";
 
 export default function Login({ route, navigation }) {
   const sendData = route.params ?? {};
-  const { theme } = useContext(AppContext);
+  const { theme, loginAuth } = useContext(AppContext);
   const styles = createStyles(theme);
 
   const [formRegisterData, setFormRegisterData] = useState({
     email: "",
     password: "",
   });
+
+  const confirmLogin = () => {
+    if (!formRegisterData.email || !formRegisterData.password) {
+      alert("Please fill in all fields");
+      return;
+    }
+    const result = loginAuth(formRegisterData.email, formRegisterData.password);
+    //await result and check if login was successful. if not alert user
+    if (result.success) {
+      alert("Login successful");
+    } else {
+      alert("Login failed: " + result.message);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -41,6 +55,14 @@ export default function Login({ route, navigation }) {
           setFormRegisterData({ ...formRegisterData, password: text })
         }
       />
+
+      <TouchableHighlight
+        onPress={() => {
+          confirmLogin();
+        }}
+      >
+        <Text>Login</Text>
+      </TouchableHighlight>
     </View>
   );
 }

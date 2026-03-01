@@ -13,7 +13,7 @@ import { AppContext } from "../../contexts/appContext";
 
 export default function signIn({ route, navigation }) {
   const sendData = route.params ?? {};
-  const { theme } = useContext(AppContext);
+  const { theme, registerAuth, loginAuth } = useContext(AppContext);
   const styles = createStyles(theme);
 
   const [formRegisterData, setFormRegisterData] = useState({
@@ -21,10 +21,48 @@ export default function signIn({ route, navigation }) {
     last_name: "",
     email: "",
     password: "",
+    confirm_password: "",
     age: "",
     contact_number: "",
     address: "", //optional
   });
+
+  const confirmRegister = () => {
+    if (
+      !formRegisterData.first_name ||
+      !formRegisterData.last_name ||
+      !formRegisterData.email ||
+      !formRegisterData.password ||
+      !formRegisterData.confirm_password ||
+      !formRegisterData.age ||
+      !formRegisterData.contact_number ||
+      !formRegisterData.address
+    ) {
+      alert("Please fill in all fields");
+      return;
+    }
+
+    if (formRegisterData.password !== formRegisterData.confirm_password) {
+      alert("Password and confirm password does not match!");
+      return;
+    }
+
+    const result = registerAuth(
+      formRegisterData.first_name,
+      formRegisterData.last_name,
+      formRegisterData.email,
+      formRegisterData.password,
+      formRegisterData.age,
+      formRegisterData.contact_number,
+      formRegisterData.address,
+    );
+
+    if (result.success) {
+      alert("Login successful");
+    } else {
+      alert("Login failed: " + result.message);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -86,6 +124,13 @@ export default function signIn({ route, navigation }) {
           setFormRegisterData({ ...formRegisterData, address: text })
         }
       />
+      <TouchableHighlight
+        onPress={() => {
+          confirmRegister();
+        }}
+      >
+        <Text>Login</Text>
+      </TouchableHighlight>
     </View>
   );
 }

@@ -1,68 +1,31 @@
-Project README — How to run & essential component reference
+Tutorial React SPA
+==================
 
-1) Run the project (quick start)
-- Prerequisites: Node.js (>=14), npm or yarn, Git.
-- Install dependencies: `npm install` (or `yarn`)
-- Start Metro / Expo: `npx expo start`
+1) Run the project
+- Prerequisites: Node.js (>=18), npm, Git.
+- Install dependencies: `npm install`
+- Start the Vite development server: `npm run dev`
+- Build for production: `npm run build`
 
-2) Typical workflow on Windows
-- Open a terminal in the project root (where `package.json` is).
-- Run `npm install` once after cloning.
-- Run `npx expo start` to launch the Metro bundler and Expo devtools.
-- Use the Expo Go app (Android/iOS) or an Android emulator.
+2) Key directories
+- `src/main.jsx`: Vite entry point that wires the `AppProvider` and renders the router.
+- `src/App.jsx`: Route definitions, authentication gate, and the shared navigation bar.
+- `src/contexts/appContext.jsx`: Mirrors the previous Expo context but uses `localStorage` for persistence and keeps the login/register helpers.
+- `src/pages/`: Each file under here is a screen (home, fixes, logs, chat, settings, register, send form).
+- `src/components/`: Reusable pieces such as the `FixButtons` grid and `GlobalNav` bar.
+- `src/assets/`: Static images for the dashboard, fixes, and chat icons.
+- `src/styles/global.css`: Shared layout and utility styles.
 
-3) Important files & entry points
-- `App.js` / `index.js`: the app entry files that register the root component.
-- `app.json`: Expo config.
-- `package.json`: scripts and dependencies.
-- `Root.js`: likely contains app-level setup (navigation, providers).
+3) API / Services
+- Authentication and registration still POST to `https://handy-fix-theta.vercel.app/api/login` and `/api/register`.
+- Settings polling and POSTs hit the same `test` and `post` endpoints used previously.
 
-4) Project structure (high level)
-- app/: app-specific assets and screens
-- assets/: static assets (images, icons)
-- components/: reusable components and major screens
-  - `components/App.js` — main app container / root UI (check file to confirm exact role)
-  - `components/fixButtons.js` — UI for fix-related buttons
-  - `components/home.js` — Home screen component
-  - `components/loadScreen.js` — App loading / splash UI
-  - `components/SAMPLE!!!.js` — sample/test component (non-production)
-  - `components/settings.js` — Settings screen component
-  - `components/chats/chatDetails.js` — Chat details view
-  - `components/chats/chatLists.js` — Chat list view
-  - `components/fixes/fixesSubType.js` — fix sub-type screen/component
-  - `components/fixes/fixesType.js` — fix type screen/component
-  - `components/fixes/send.js` — screen/component to send fixes
-  - `components/logs/logs.js` — logs viewer component
-  - `components/Signing/login.js` — login screen
-  - `components/Signing/RegisterComponent.js` — registration component
-  - `components/Signing/signIn.js` — alternate sign-in handling
-- contexts/: React context providers
-  - `contexts/appContext.js` — app-level context (global state, helpers)
+4) Testing notes
+- Confirm routing: `/register`, `/`, `/fixes`, `/logs`, `/chat`, `/settings`, `/send`.
+- Ensure `loginAuth` and `registerAuth` update localStorage and let you enter the guarded routes.
+- Uploading images in the send form should create previews via `URL.createObjectURL`.
 
-5) Component & context notes (what to look for)
-- Screens vs UI components: files named like `home.js`, `login.js`, `send.js` are screens. Files like `fixButtons.js` are smaller UI components used by screens.
-- Check each file for exported React components (usually `export default`) and any connected navigation or context usage.
-- `contexts/appContext.js` likely exports a provider and hook — search for `AppContext`, `AppProvider`, or `useAppContext`.
-
-6) Common commands
-- `npm start` — may forward to `expo start` if defined in `package.json`.
-- `npx expo start` — start Metro and Expo devtools.
-- `npx expo start -c` — clear Metro cache (fix many bundler issues).
-- `npm run android` / `npm run ios` — if defined in `package.json` to run on specific platforms.
-
-7) Troubleshooting
-- Metro bundler errors: stop Metro, run `npx expo start -c`.
-- Native build failures: ensure correct Android SDK / emulator config, or use Expo Go for JS-only flow.
-- Missing module errors: run `npm install` and double-check the `import` paths.
-- If components fail to render, open the component file and confirm default export and proper `react` import.
-
-8) Notes for contributors
-- Keep components modular: screens under `components/` subfolders, small UI widgets at top-level `components/`.
-- Use `contexts/appContext.js` for global state rather than prop-drilling.
-- Add small README updates when adding new screens or major changes to navigation.
-
-9) Next steps / suggestions
-- I can generate a more detailed component map by reading each component file and extracting short descriptions and exports.
-- I can also add `README.md` style formatting (Markdown) or create a DOCX if you prefer.
-
--- End of README --
+5) Notes
+- This project is now a browser-first Vite SPA. The old Expo files have been removed.
+- Assets were moved into `src/assets` so import paths resolve under the new bundler.
+- The theme token set in `src/theme.js` keeps the same colors, spacing, and sizes as the native app.

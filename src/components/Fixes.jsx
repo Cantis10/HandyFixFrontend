@@ -20,9 +20,13 @@ export default function FixesPage() {
   const { theme } = useAppContext();
 
   return (
-    <section className="page-section" style={{ backgroundColor: theme.colors.background }}>
-      <h1 className="section-heading">Choose a Service Category</h1>
-      <div className="service-grid">
+    <section className="page-section">
+      <div
+        className="service-grid"
+        style={{
+          backgroundColor: theme.colors.background,
+        }}
+      >
         {fixTypes.map((type) => (
           <button
             key={type.label}
@@ -30,9 +34,7 @@ export default function FixesPage() {
             type="button"
             onClick={() => navigate(`/fixes/${encodeURIComponent(type.label)}`)}
           >
-            <img src={type.icon} alt={type.label} style={{ width: 100, height: 100 }} />
-            <strong>{type.label}</strong>
-            <span>Explore {type.label} offerings</span>
+            <img src={type.icon} alt={type.label} style={{ width: "100%" }} />
           </button>
         ))}
       </div>

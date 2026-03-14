@@ -1,16 +1,14 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-import FixImage from "../assets/home/fix.png";
-import LogsImage from "../assets/home/logs.png";
-import ChatImage from "../assets/home/chat.png";
-import SettingsImage from "../assets/home/settings.png";
+import HomeImage from "../assets/bottomBar/home.png";
+import BookingsImage from "../assets/bottomBar/bookings.png";
+import ProfileImage from "../assets/bottomBar/profile.png";
 
 const tiles = [
-  { label: "Fix", path: "/fixes", icon: FixImage },
-  { label: "Logs", path: "/logs", icon: LogsImage },
-  { label: "Chat", path: "/chat", icon: ChatImage },
-  { label: "Settings", path: "/settings", icon: SettingsImage },
+  { label: "Home", path: "/home", icon: HomeImage },
+  { label: "Bookings", path: "/bookings", icon: BookingsImage },
+  { label: "Profile", path: "/profile", icon: ProfileImage },
 ];
 
 export default function FixButtons() {

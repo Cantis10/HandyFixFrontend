@@ -2,6 +2,54 @@ import { createContext, useCallback, useContext, useEffect, useState } from "rea
 import { baseTheme } from "../theme";
 
 const STORAGE_KEY = "user";
+const COOKIE_NAME = "user_credentials";
+const COOKIE_MAX_AGE_DAYS = 30;
+
+const writeCookie = (name, value, days) => {
+  if (typeof document === "undefined") return;
+  const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
+  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
+};
+
+const clearCookie = (name) => {
+  if (typeof document === "undefined") return;
+  document.cookie = `${name}=; max-age=0; path=/; SameSite=Lax`;
+};
+
+const readCookie = (name) => {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie
+    .split("; ")
+    .find((cookiePair) => cookiePair.startsWith(`${name}=`));
+  if (!match) return null;
+  const separatorIndex = match.indexOf("=");
+  if (separatorIndex === -1) return null;
+  return decodeURIComponent(match.substring(separatorIndex + 1));
+};
+
+const getStoredCredentials = () => {
+  try {
+    const raw = readCookie(COOKIE_NAME);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (error) {
+    console.error("Failed to parse credentials cookie", error);
+    clearCookie(COOKIE_NAME);
+    return null;
+  }
+};
+
+const persistCredentialsCookie = (credentials) => {
+  if (!credentials?.email || !credentials?.password) {
+    clearCookie(COOKIE_NAME);
+    return;
+  }
+  writeCookie(
+    COOKIE_NAME,
+    JSON.stringify({ email: credentials.email, password: credentials.password }),
+    COOKIE_MAX_AGE_DAYS,
+  );
+};
 
 export const AppContext = createContext({});
 
@@ -21,6 +69,7 @@ export function AppProvider({ children }) {
     }
   });
 
+  const [persistedCredentials, setPersistedCredentials] = useState(() => getStoredCredentials());
   const [isLoggedIn, setIsLoggedIn] = useState(Boolean(user?.email));
   const [link] = useState({ url: "https://handy-fix-theta.vercel.app/" });
 
@@ -34,9 +83,31 @@ export function AppProvider({ children }) {
     }
   }, [user]);
 
+  useEffect(() => {
+    setPersistedCredentials(getStoredCredentials());
+  }, []);
+
+  const persistCredentials = useCallback((credentials) => {
+    if (!credentials?.email || !credentials?.password) {
+      setPersistedCredentials(null);
+      clearCookie(COOKIE_NAME);
+      return;
+    }
+
+    const payload = { email: credentials.email, password: credentials.password };
+    setPersistedCredentials(payload);
+    persistCredentialsCookie(payload);
+  }, []);
+
+  const dropPersistedCredentials = useCallback(() => {
+    setPersistedCredentials(null);
+    clearCookie(COOKIE_NAME);
+  }, []);
+
   const loginAuth = useCallback(
     async (email, password) => {
       const userData = { email, password };
+      persistCredentials(userData);
       setUser(userData);
 
       try {
@@ -75,6 +146,7 @@ export function AppProvider({ children }) {
         address: formData.address,
       };
 
+      persistCredentials({ email: userData.email, password: userData.password });
       setUser(userData);
 
       try {
@@ -104,6 +176,7 @@ export function AppProvider({ children }) {
     setUser(null);
     setIsLoggedIn(false);
     localStorage.removeItem(STORAGE_KEY);
+    dropPersistedCredentials();
   }, []);
 
   return (
@@ -114,6 +187,8 @@ export function AppProvider({ children }) {
         theme: baseTheme,
         link,
         clearUserData,
+        persistedCredentials,
+        dropPersistedCredentials,
         loginAuth,
         registerAuth,
         isLoggedIn,

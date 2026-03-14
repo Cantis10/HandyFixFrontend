@@ -89,8 +89,8 @@ body {
 }
 
 .service-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  display: flex;
+
   gap: 12px;
 }
 

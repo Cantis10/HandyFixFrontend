@@ -11,16 +11,16 @@ const tiles = [
   { label: "Profile", path: "/profile", icon: ProfileImage },
 ];
 
-export default function FixButtons() {
+export default function buttomButtons() {
   const navigate = useNavigate();
 
   return (
-    <div className="fix-buttons-grid">
+    <div className="bottom-buttons-grid">
       {tiles.map((tile) => (
         <button
           key={tile.path}
           type="button"
-          className="fix-button"
+          className="bottom-button"
           onClick={() => navigate(tile.path)}
         >
           <img src={tile.icon} alt={tile.label} />

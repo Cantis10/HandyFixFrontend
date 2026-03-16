@@ -17,6 +17,7 @@ import ChatDetailsPage from "./pages/ChatDetailsPage";
 import ProfilePage from "./pages/ProfilePage";
 import RegisterPage from "./pages/RegisterPage";
 import GlobalNav from "./components/GlobalNav";
+import BookingPage from "./pages/BookingsPage";
 
 function AuthenticatedRoute() {
   const { isLoggedIn } = useAppContext();
@@ -51,7 +52,8 @@ export default function App() {
             <Route path="/logs" element={<LogsPage />} />
             <Route path="/chat" element={<ChatListPage />} />
             <Route path="/chat/:ticketId" element={<ChatDetailsPage />} />
-            <Route path="/ProfilePage" element={<ProfilePage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/bookings" element={<BookingPage />} /> b
           </Route>
           <Route
             path="*"

@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppContext } from "../contexts/appContext";
-
+import BottomBar from "../components/bottomBar";
+import FixesDescription from "../components/fixesDescription";
 const FIX_SERVICES = {
   Plumbing: [
     "Leak Repair",
@@ -41,11 +42,27 @@ const FIX_SERVICES = {
 };
 
 export default function FixesSubTypePage() {
+  const [showTypes, setShowTypes] = useState(true);
+  const [showSelected, setShowSelected] = useState(false);
+  const [selectedService, setSelectedService] = useState(false);
   const { fixType } = useParams();
   const navigate = useNavigate();
   const { theme } = useAppContext();
 
   const services = FIX_SERVICES[fixType] ?? [];
+
+  function showSubsections(string) {
+    //dont navigate, call fixesDescription to display
+    setShowTypes(false);
+    setShowSelected(true);
+    setSelectedService(string);
+    console.log(string);
+  }
+
+  function goBack() {
+    setShowTypes(true);
+    setShowSelected(false);
+  }
 
   return (
     <section
@@ -55,26 +72,38 @@ export default function FixesSubTypePage() {
       <h1 className="section-heading">
         Services for {fixType ?? "your selection"}
       </h1>
-      {services.length === 0 ? (
-        <p>No services listed for "{fixType}".</p>
-      ) : (
-        <div className="service-grid">
+      {!showTypes ? null : (
+        <div className="sub-service-grid">
           {services.map((service) => (
             <button
               key={service}
               className="service-card"
               type="button"
-              onClick={() =>
-                navigate("/send", {
-                  state: { fixType, service },
-                })
-              }
+              onClick={() => showSubsections(service)}
             >
               <strong>{service}</strong>
             </button>
           ))}
         </div>
       )}
+
+      {!showSelected ? null : (
+        <div className="sub-service-grid">
+          <button
+            className="service-card"
+            type="button"
+            onClick={() => goBack()}
+          >
+            Go Back
+          </button>
+          <FixesDescription
+            fixType={selectedService}
+            goBack={() => setShowTypes(true)}
+          />
+        </div>
+      )}
+
+      <BottomBar />
     </section>
   );
 }

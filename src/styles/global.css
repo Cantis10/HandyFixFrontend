@@ -48,9 +48,14 @@ body {
 }
 
 .page-section {
+  display: flex;
+  flex-direction: column;
+  flex: 1; 
+  gap: 1rem;
   padding: 1.5rem;
   max-width: 960px;
   margin: 0 auto;
+  
 }
 
 .section-heading {
@@ -59,14 +64,18 @@ body {
   margin-bottom: 1rem;
 }
 
-.fix-buttons-grid {
+.bottom-buttons-grid {
+  position: absolute;
+    bottom: 1.5rem; 
+      left: 50%;
+  transform: translateX(-50%);
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
   justify-content: center;
 }
 
-.fix-button {
+.bottom-button {
   border: none;
   background: #fff;
   padding: 0.5rem;
@@ -75,6 +84,13 @@ body {
   text-align: center;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+.bottom-button img {
+  display: block;
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
 }
 
 .fix-button:hover {
@@ -94,6 +110,11 @@ body {
   gap: 12px;
 }
 
+.sub-service-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 .service-card,
 .log-card,
 .chat-card {

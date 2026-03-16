@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../contexts/appContext";
+import BottomBar from "../components/bottomBar";
 
-export default function SettingsPage() {
+export default function ProfilePage() {
   const { theme, link, clearUserData } = useAppContext();
   const navigate = useNavigate();
   const [polledMessages, setPolledMessages] = useState(null);
@@ -39,8 +40,11 @@ export default function SettingsPage() {
   }, [link.url]);
 
   return (
-    <section className="page-section" style={{ backgroundColor: theme.colors.background }}>
-      <h1 className="section-heading">Settings</h1>
+    <section
+      className="page-section"
+      style={{ backgroundColor: theme.colors.background }}
+    >
+      <h1 className="section-heading">Profile</h1>
       <p>Theme color: {theme.colors.primary}</p>
       <p>Polling response: {polledMessages ?? "Loading..."}</p>
       <p>Post response: {postResponse ?? "Sending..."}</p>
@@ -53,6 +57,7 @@ export default function SettingsPage() {
       >
         Clear User Data & Logout
       </button>
+      <BottomBar />
     </section>
   );
 }
